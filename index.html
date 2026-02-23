@@ -1,0 +1,482 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+    <meta charset="UTF-8">  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">  
+    <title>Deen Seekho | Islamic Q&A</title>  
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">  
+    <script src="https://unpkg.com/lucide@latest"></script>  
+    <style>  
+        :root { --primary: #065f46; --bg: #f8fafc; --border: #e2e8f0; }  
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; color: #1e293b; padding-bottom: 80px; }  
+        .urdu-text { font-family: 'Noto Nastaliq Urdu', serif; direction: rtl; line-height: 2.2; text-align: right; }  header { background: #fff; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 1000; }  
+    .container { max-width: 600px; margin: 15px auto; padding: 0 15px; }  
+    .card { background: #fff; border-radius: 15px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 15px; }  
+      
+    /* Floating Ask Button for Gallery */  
+    .floating-ask { background: var(--primary); color: white; padding: 12px 20px; border-radius: 30px; border: none; font-weight: bold; display: flex; align-items: center; gap: 8px; margin: 10px auto 20px; cursor: pointer; box-shadow: 0 4px 10px rgba(6, 95, 70, 0.3); }  
+
+    /* Footer */  
+    footer { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); z-index: 1000; }  
+    .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; color: #64748b; cursor: pointer; flex: 1; }  
+    .nav-item.active { color: var(--primary); font-weight: 700; }  
+
+    .main-btn { background: var(--primary); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }  
+    .hidden { display: none !important; }  
+    input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1.5px solid var(--border); box-sizing: border-box; }  
+      
+    .pass-wrapper { position: relative; }  
+    .pass-toggle { position: absolute; right: 12px; top: 20px; cursor: pointer; color: var(--primary); }  
+</style>
+
+</head>  
+<body>  <header>  
+    <div style="display:flex; align-items:center; gap:8px;">  
+        <div style="background:var(--primary); color:#fff; padding:5px; border-radius:6px;"><i data-lucide="book-open" size="20"></i></div>  
+        <span style="font-weight:800; font-size:1.1rem;">Deen Seekho</span>  
+    </div>  
+    <div id="authHeader" style="display:flex; align-items:center; gap:10px;">  
+        <span id="userMail" style="font-size:0.7rem; color:#64748b;"></span>  
+        <i data-lucide="log-out" id="logoutBtn" class="hidden" style="color:#ef4444; cursor:pointer;" size="18"></i>  
+    </div>  
+</header>  <div class="container">  <div id="homeSection" class="page">  
+    <button class="floating-ask" onclick="showPage('ask')">  
+        <i data-lucide="message-circle"></i> Sawal Puchein  
+    </button>  
+    <div id="publicQuestions">Fatawa load ho rahe hain...</div>  
+</div>  
+<!-- YAHAN DASHBOARD ADD HOGA -->
+
+<div id="muftiDashboard" style="display:none; padding:15px;">
+  <h2 style="text-align:center;">Mufti Dashboard</h2>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:20px;">
+    
+    <div style="background:#1e293b; padding:15px; border-radius:10px; text-align:center;">
+      <h3>Total Questions</h3>
+      <h1 id="totalQuestions">0</h1>
+    </div>
+
+    <div style="background:#7c2d12; padding:15px; border-radius:10px; text-align:center;">
+      <h3>Pending</h3>
+      <h1 id="pendingQuestions">0</h1>
+    </div>
+
+    <div style="background:#14532d; padding:15px; border-radius:10px; text-align:center;">
+      <h3>Answered</h3>
+      <h1 id="answeredQuestions">0</h1>
+    </div>
+
+    <div style="background:#312e81; padding:15px; border-radius:10px; text-align:center;">
+      <h3>Total Users</h3>
+      <h1 id="totalUsers">0</h1>
+    </div>
+
+  </div>
+</div>
+<div id="userDashboard" style="display:none; padding:15px;">
+  <h2 style="text-align:center;">My Questions</h2>
+
+  <div style="display:grid; grid-template-columns:1fr 1fr; gap:15px; margin-top:15px;">
+    <div style="background:#1e293b; padding:12px; border-radius:10px; text-align:center;">
+      <h4>Total</h4>
+      <h2 id="uTotal">0</h2>
+    </div>
+
+    <div style="background:#14532d; padding:12px; border-radius:10px; text-align:center;">
+      <h4>Answered</h4>
+      <h2 id="uAnswered">0</h2>
+    </div>
+  </div>
+
+  <div id="userQuestionsList" style="margin-top:20px;"></div>
+</div>
+<div id="askSection" class="page hidden">  
+    <div class="card">  
+        <h3 class="urdu-text">اپنا سوال لکھیں</h3>  
+        <textarea id="qInput" rows="5" class="urdu-text" placeholder="Yahan apna sawal tafseel se likhen..."></textarea>  
+        <button class="main-btn" onclick="handleAskPost()">Sawal Post Karein <i data-lucide="send"></i></button>  
+        <p id="guestNotice" class="hidden" style="color:#ef4444; font-size:0.8rem; text-align:center; margin-top:10px;">Sawal puchne ke liye Login zaroori hai!</p>  
+    </div>  
+</div>  
+
+<div id="authSection" class="page hidden">  
+    <div class="card">  
+        <h2 id="authTitle" style="text-align:center;">Account</h2>  
+        <div style="display:flex; gap:10px; margin-bottom:15px;">  
+            <button id="btnUser" class="main-btn" style="background:#f1f5f9; color:#475569;" onclick="setRole('user')">User</button>  
+            <button id="btnMufti" class="main-btn" style="background:#f1f5f9; color:#475569;" onclick="setRole('mufti')">Mufti</button>  
+        </div>  
+          
+        <input type="email" id="email" placeholder="Email Address">  
+          
+        <div id="muftiFields" class="hidden">  
+            <input type="text" id="mName" placeholder="Mukammal Naam (e.g. Mufti Zaid)">  
+            <input type="text" id="mEdu" placeholder="Talimi Lyaqat (e.g. Alim, Mufti)">  
+            <input type="text" id="mIdara" placeholder="Kis Idare se Farig hain?">  
+            <input type="number" id="mYear" placeholder="Faraghat ka Saal (e.g. 2018)">  
+        </div>  
+
+        <div class="pass-wrapper">  
+            <input type="password" id="password" placeholder="Password">  
+            <i data-lucide="eye" class="pass-toggle" id="eyeIcon" onclick="togglePass()"></i>  
+        </div>  
+
+        <button class="main-btn" id="authBtn" style="margin-top:10px;">Aage Badhein</button>  
+        <p style="text-align:center; font-size:0.85rem;">  
+            <span id="toggleText">Account nahi hai?</span>   
+            <a href="javascript:void(0)" id="switchAuth" style="color:var(--primary); font-weight:700;">Sign Up</a>  
+        </p>  
+    </div>  
+</div>
+
+</div>  <footer>  
+    <div class="nav-item active" onclick="showPage('home')"><i data-lucide="home"></i><span>Home</span></div>  
+    <div class="nav-item" onclick="showPage('latest')"><i data-lucide="clock"></i><span>Latest</span></div>  
+    <div class="nav-item" onclick="showPage('ask')"><i data-lucide="plus-square"></i><span>Ask</span></div>  
+    <div class="nav-item" onclick="showPage('short')"><i data-lucide="align-left"></i><span>Short</span></div>  
+    <div class="nav-item" onclick="showPage('auth')"><i data-lucide="user"></i><span>Profile</span></div>  
+</footer> 
+  <script type="module">  
+  
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";  
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";  
+    import { getFirestore, doc, setDoc, getDoc, collection, 
+  addDoc, query, where, onSnapshot, orderBy, 
+  serverTimestamp, updateDoc, deleteDoc 
+} from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+  
+    // --- PROJECT CONFIG ---  
+    const firebaseConfig = {
+  apiKey: "AIzaSyD57kA0XKRvlsM6W4LMZThiKm0N2WV6FTw",
+  authDomain: "deen-seekho-eabb8.firebaseapp.com",
+  projectId: "deen-seekho-eabb8",
+  storageBucket: "deen-seekho-eabb8.firebasestorage.app",
+  messagingSenderId: "887722708251",
+  appId: "1:887722708251:web:a9ad22b8d151162e19d7be"
+};
+  
+    const app = initializeApp(firebaseConfig);  
+    const auth = getAuth(app);  
+    const db = getFirestore(app);  
+  let isAdmin = false;
+  let isMufti = false;
+ const ADMIN_EMAIL = "mohammedbadruddinansari@gmail.com";
+    lucide.createIcons();  
+  
+    let currentUser = null;  
+    let userRole = 'user';  
+    let isSignup = false;  
+  let lastNotifiedAnswers = new Set();
+let lastNotifiedQuestions = new Set();
+  
+    // --- Password Toggle ---  
+    window.togglePass = () => {  
+        const p = document.getElementById('password');  
+        const icon = document.getElementById('eyeIcon');  
+        if(p.type === 'password') {  
+            p.type = 'text';  
+            icon.innerHTML = lucide.icons.eyeOff; // Update icon via lucide if needed  
+        } else {  
+            p.type = 'password';  
+        }  
+    };  
+  
+    // --- Role & Auth Logic ---  
+    window.setRole = (r) => {  
+        userRole = r;  
+        document.getElementById('btnUser').style.background = r === 'user' ? '#065f46' : '#f1f5f9';  
+        document.getElementById('btnUser').style.color = r === 'user' ? '#fff' : '#475569';  
+        document.getElementById('btnMufti').style.background = r === 'mufti' ? '#065f46' : '#f1f5f9';  
+        document.getElementById('btnMufti').style.color = r === 'mufti' ? '#fff' : '#475569';  
+        updateFields();  
+    };  
+  
+    function updateFields() {  
+        document.getElementById('muftiFields').classList.toggle('hidden', userRole === 'user' || !isSignup);  
+    }  
+  
+    document.getElementById('switchAuth').onclick = () => {  
+        isSignup = !isSignup;  
+        document.getElementById('authTitle').innerText = isSignup ? "Naya Account" : "Khush Amdeed";  
+        document.getElementById('switchAuth').innerText = isSignup ? "Login Karein" : "Sign Up";  
+        updateFields();  
+    };  
+  
+    // --- Navigation ---  
+    window.showPage = (pageId) => {  
+        document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));  
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));  
+          
+        if(pageId === 'home') document.getElementById('homeSection').classList.remove('hidden');  
+        else if(pageId === 'ask') document.getElementById('askSection').classList.remove('hidden');  
+        else if(pageId === 'auth') document.getElementById('authSection').classList.remove('hidden');  
+  
+        // Footer highlight  
+        const items = document.querySelectorAll('.nav-item');  
+        if(pageId === 'home') items[0].classList.add('active');  
+        if(pageId === 'ask') items[2].classList.add('active');  
+        if(pageId === 'auth') items[4].classList.add('active');  
+    };  
+  
+    // --- Firebase Actions ---  
+    document.getElementById('authBtn').onclick = async () => {  
+        const email = document.getElementById('email').value;  
+        const pass = document.getElementById('password').value;  
+        try {  
+            if(isSignup) {  
+                const res = await createUserWithEmailAndPassword(auth, email, pass);  
+                await setDoc(doc(db, "users", res.user.uid), {  
+                    email, role: userRole,   
+                    name: document.getElementById('mName').value || 'User',  
+                    edu: document.getElementById('mEdu').value || '',  
+                    idara: document.getElementById('mIdara').value || '',  
+                    year: document.getElementById('mYear').value || '',  
+                    verified: false  
+                });  
+            } else {  
+                await signInWithEmailAndPassword(auth, email, pass);  
+            }  
+            showPage('home');  
+        } catch (e) { alert(e.message); }  
+    };  
+  
+    window.handleAskPost = async () => {  
+        if(!currentUser) {  
+            document.getElementById('guestNotice').classList.remove('hidden');  
+            return;  
+        }  
+        const text = document.getElementById('qInput').value;  
+        if(!text) return;  
+        await addDoc(collection(db, "questions"), {  
+            text, userId: currentUser.uid, status: 'pending', time: serverTimestamp()  
+        });  
+        alert("Sawal bhej diya gaya!");  
+        document.getElementById('qInput').value = "";  
+        showPage('home');  
+    };  
+  
+    onAuthStateChanged(auth, async (user) => {
+
+    if (user) {
+        currentUser = user;
+
+        document.getElementById('userMail').innerText = user.email;
+        document.getElementById('logoutBtn').classList.remove('hidden');
+        document.getElementById('guestNotice').classList.add('hidden');
+
+        const userDoc = await getDoc(doc(db, "users", user.uid));
+
+        if (userDoc.exists()) {
+            const userData = userDoc.data();
+            isAdmin = user.email === ADMIN_EMAIL;
+            isMufti = userData.role === "mufti";
+        }
+
+    } else {
+        currentUser = null;
+        isAdmin = false;
+        isMufti = false;
+
+        document.getElementById('userMail').innerText = "";
+        document.getElementById('logoutBtn').classList.add('hidden');
+    }
+
+    loadGallery();
+        if(isMufti){
+    document.getElementById("muftiDashboard").style.display = "block";        
+    loadDashboard();
+}else{
+    document.getElementById("muftiDashboard").style.display = "none";
+}
+        if(currentUser && !isMufti){
+    document.getElementById("userDashboard").style.display = "block";
+    loadUserDashboard();
+}else{
+    document.getElementById("userDashboard").style.display = "none";
+}
+});
+    document.getElementById('logoutBtn').onclick = () => signOut(auth);  
+    let dashboardUnsubscribe = null;
+let galleryUnsubscribe = null;
+    let userDashboardUnsubscribe = null;
+
+function loadUserDashboard(){
+
+    if(!currentUser) return;
+
+    if(userDashboardUnsubscribe) userDashboardUnsubscribe();
+
+    const q = query(
+        collection(db, "questions"),
+        where("userId", "==", currentUser.uid),
+        orderBy("time", "desc")
+    );
+
+    userDashboardUnsubscribe = onSnapshot(q, (snap)=>{
+
+        let total = 0;
+        let answered = 0;
+        let html = "";
+
+        snap.forEach(docSnap=>{
+            total++;
+            const d = docSnap.data();
+            const id = docSnap.id;
+
+            if(d.status === "answered") answered++;
+
+            html += `<div class="card">
+                <p class="urdu-text"><b>Sawal:</b> ${d.text}</p>
+                <p>Status: <b>${d.status}</b></p>`;
+
+            if(d.answer){
+                html += `
+                <div style="background:#f1f5f9; padding:10px; border-radius:10px; margin-top:8px;">
+                    <p class="urdu-text"><b>Jawab:</b> ${d.answer}</p>
+                </div>`;
+            }
+
+            html += `</div>`;
+        });
+
+        document.getElementById("uTotal").innerText = total;
+        document.getElementById("uAnswered").innerText = answered;
+        document.getElementById("userQuestionsList").innerHTML =
+            html || "Aap ne abhi tak koi sawal nahi poocha.";
+    });
+}
+function loadDashboard(){
+
+    if(dashboardUnsubscribe) dashboardUnsubscribe();
+
+    dashboardUnsubscribe = onSnapshot(collection(db, "questions"), (snap)=>{
+        let total = 0;
+        let pending = 0;
+        let answered = 0;
+
+        snap.forEach(doc=>{
+            total++;
+            const d = doc.data();
+            if(d.status === "answered"){
+                answered++;
+            }else{
+                pending++;
+            }
+        });
+
+        document.getElementById("totalQuestions").innerText = total;
+        document.getElementById("pendingQuestions").innerText = pending;
+        document.getElementById("answeredQuestions").innerText = answered;
+    });
+
+    onSnapshot(collection(db, "users"), (snap)=>{
+        document.getElementById("totalUsers").innerText = snap.size;
+    });
+}
+function loadGallery() {
+
+    if(galleryUnsubscribe) galleryUnsubscribe();
+
+    const q = query(collection(db, "questions"), orderBy("time", "desc"));
+
+    galleryUnsubscribe = onSnapshot(q, (snap) => {
+
+        let h = "";
+        let pendingCount = 0;
+
+        snap.forEach(docSnap => {
+            const d = docSnap.data();
+            const id = docSnap.id;
+
+            h += `<div class="card">
+                <p class="urdu-text" style="color:var(--primary); font-weight:700;">
+                Sawal: ${d.text}</p>`;
+
+            // ===============================
+            // MUFTI NOTIFICATION SYSTEM
+            // ===============================
+            if(d.status !== "answered") {
+                pendingCount++;
+
+                if(isMufti && !lastNotifiedQuestions.has(id)) {
+                    alert("Naya sawal aaya hai!");
+                    lastNotifiedQuestions.add(id);
+                }
+            }
+
+            // ===============================
+            // USER ANSWER NOTIFICATION
+            // ===============================
+            if(d.status === "answered") {
+
+                if(currentUser && d.userId === currentUser.uid && !lastNotifiedAnswers.has(id)) {
+                    alert("Aapke sawal ka jawab aa gaya!");
+                    lastNotifiedAnswers.add(id);
+                }
+
+                h += `
+                <div style="background:#f1f5f9; padding:12px; border-radius:10px; margin-top:8px;">
+                    <p class="urdu-text">Jawab: ${d.answer}</p>
+                    <small>Mujeeb: <b>${d.muftiName}</b></small>
+                </div>`;
+            }
+
+            // ===============================
+            // MUFTI ANSWER BOX
+            // ===============================
+            if(currentUser && isMufti && d.status !== "answered") {
+                h += `
+                <textarea id="ans_${id}" class="urdu-text" placeholder="Jawab likhein..."></textarea>
+                <button class="main-btn" onclick="postAnswer('${id}')">
+                Jawab Submit Karein
+                </button>`;
+            }
+
+            // ===============================
+            // ADMIN DELETE
+            // ===============================
+            if(isAdmin) {
+                h += `<button onclick="deleteQuestion('${id}')" 
+                        style="margin-top:10px; background:#ef4444; color:white; border:none; padding:8px; border-radius:8px;">
+                        Delete
+                      </button>`;
+            }
+
+            h += `</div>`;
+        });
+
+        // Pending Count Badge for Mufti
+        if(isMufti && pendingCount > 0) {
+            document.title = `(${pendingCount}) New Questions - Deen Seekho`;
+        } else {
+            document.title = "Deen Seekho | Islamic Q&A";
+        }
+
+        document.getElementById('publicQuestions').innerHTML =
+            h || "Abhi koi sawal nahi hain.";
+
+    });
+} 
+  window.postAnswer = async (id) => {
+    const ans = document.getElementById("ans_" + id).value;
+    if(!ans) return alert("Jawab likhein");
+
+    await updateDoc(doc(db, "questions", id), {
+    answer: ans,
+    status: "answered",
+    muftiName: currentUser.email,
+    answeredByUid: currentUser.uid,   // ✅ YE ADD KARNA HAI
+    answeredAt: serverTimestamp()
+});
+
+    alert("Jawab post ho gaya");
+};
+
+window.deleteQuestion = async (id) => {
+    if(!confirm("Delete karna hai?")) return;
+    await deleteDoc(doc(db, "questions", id));
+    alert("Delete ho gaya");
+};
+  </script>  
+</body>  
+</html>
