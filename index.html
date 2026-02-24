@@ -461,16 +461,20 @@ function loadGallery() {
     const ans = document.getElementById("ans_" + id).value;
     if(!ans) return alert("Jawab likhein");
 
-    await updateDoc(doc(db, "questions", id), {
-    answer: ans,
-    status: "answered",
-    muftiName: currentUser.email,
-    answeredByUid: currentUser.uid,   // ✅ YE ADD KARNA HAI
-    answeredAt: serverTimestamp()
-});
+    // Mufti ka naam fetch karein user document se
+    const muftiDoc = await getDoc(doc(db, "users", currentUser.uid));
+    const muftiName = muftiDoc.exists() ? muftiDoc.data().name : currentUser.email;
 
+    await updateDoc(doc(db, "questions", id), {
+        answer: ans,
+        status: "answered",
+        muftiName: muftiName, // Email ki jagah Naam
+        answeredByUid: currentUser.uid,
+        answeredAt: serverTimestamp()
+    });
     alert("Jawab post ho gaya");
 };
+      
 
 window.deleteQuestion = async (id) => {
     if(!confirm("Delete karna hai?")) return;
