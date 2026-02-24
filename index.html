@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deen Seekho | Islamic Q&A</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+        :root { --primary: #065f46; --bg: #f8fafc; --border: #e2e8f0; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); margin: 0; padding-bottom: 80px; color: #1e293b; }
+        
+        /* Sirf content ke liye Urdu Font */
+        .urdu-content { font-family: 'Noto Nastaliq Urdu', serif; direction: rtl; line-height: 2.3; text-align: right; }
+        
+        header { background: #fff; padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid var(--primary); position: sticky; top: 0; z-index: 1000; }
+        .container { max-width: 600px; margin: 15px auto; padding: 0 15px; }
+        .card { background: #fff; border-radius: 15px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); border: 1px solid var(--border); margin-bottom: 15px; }
+        
+        .main-btn { background: var(--primary); color: #fff; border: none; width: 100%; padding: 14px; border-radius: 10px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; margin-top: 10px; transition: 0.3s; }
+        .main-btn:active { transform: scale(0.98); }
+        .hidden { display: none !important; }
+        
+        input, textarea { width: 100%; padding: 12px; margin: 8px 0; border-radius: 10px; border: 1.5px solid var(--border); box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        textarea.urdu-content { font-size: 1.1rem; }
+
+        footer { position: fixed; bottom: 0; width: 100%; background: #fff; display: flex; justify-content: space-around; padding: 12px 0; border-top: 1px solid var(--border); z-index: 1000; }
+        .nav-item { display: flex; flex-direction: column; align-items: center; font-size: 0.75rem; color: #64748b; cursor: pointer; flex: 1; }
+        .nav-item.active { color: var(--primary); font-weight: 700; }
+    </style>
+</head>
+<body>
+
+<header>
+    <div style="display:flex; align-items:center; gap:8px;">
+        <div style="background:var(--primary); color:#fff; padding:5px; border-radius:6px;"><i data-lucide="book-open" size="20"></i></div>
+        <span style="font-weight:800; font-size:1.1rem;">Deen Seekho</span>
+    </div>
+    <div id="authHeader" style="display:flex; align-items:center; gap:10px;">
+        <span id="userMail" style="font-size:0.75rem; font-weight:600;"></span>
+        <i data-lucide="log-out" id="logoutBtn" class="hidden" style="color:#ef4444; cursor:pointer;" size="20"></i>
+    </div>
+</header>
+
+<div class="container">
+    <div id="homeSection" class="page">
+        <button class="main-btn" onclick="showPage('ask')" style="border-radius:30px; margin-bottom:20px; width: auto; padding: 10px 25px; margin-inline: auto;">
+            <i data-lucide="message-circle"></i> Ask a Question
+        </button>
+        <div id="publicQuestions">Loading fatawa...</div>
+    </div>
+
+    <div id="authSection" class="page">
+        <div class="card">
+            <h2 id="authTitle" style="text-align:center; margin-top:0;">Login</h2>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button id="btnUser" class="main-btn" style="background:var(--primary); color:#fff;" onclick="setRole('user')">User</button>
+                <button id="btnMufti" class="main-btn" style="background:#f1f5f9; color:#475569;" onclick="setRole('mufti')">Mufti</button>
+            </div>
+            
+            <input type="email" id="email" placeholder="Email Address">
+            <div id="muftiFields" class="hidden">
+                <input type="text" id="mName" placeholder="Full Name (e.g. Mufti Zaid)">
+                <input type="text" id="mEdu" placeholder="Education (e.g. Alim, Mufti)">
+            </div>
+            <input type="password" id="password" placeholder="Password">
+            
+            <button class="main-btn" id="authBtn">Continue</button>
+            <p style="text-align:center; font-size:0.85rem; margin-top:15px;">
+                <span id="toggleText">Don't have an account?</span> 
+                <a href="javascript:void(0)" id="switchAuth" style="color:var(--primary); font-weight:bold;">Sign Up</a>
+            </p>
+        </div>
+    </div>
+
+    <div id="muftiDashboard" class="page hidden">
+        <div class="card" style="background: linear-gradient(to bottom right, #ffffff, #f0fdf4);">
+            <h2 style="text-align:center; color: var(--primary); margin-top:0;">Mufti Dashboard</h2>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 20px;">
+                <div style="background:#1e293b; color:white; padding:15px; border-radius:12px; text-align:center;">
+                    <small>Total Qs</small><h2 id="totalQuestions" style="margin:0;">0</h2>
+                </div>
+                <div style="background:#b91c1c; color:white; padding:15px; border-radius:12px; text-align:center;">
+                    <small>Pending</small><h2 id="pendingQuestions" style="margin:0;">0</h2>
+                </div>
+            </div>
+            
+            <div style="border-top:1px solid #e2e8f0; padding-top:15px;">
+                <h3 style="font-size:1rem; margin-bottom:10px;">Complete Your Profile</h3>
+                <input type="text" id="editName" placeholder="Update Name">
+                <input type="text" id="editEdu" placeholder="Update Education">
+                <button onclick="saveProfile()" class="main-btn" style="background:#475569; font-size:0.9rem;">Save Changes</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="userDashboard" class="page hidden">
+        <div class="card">
+            <h2 style="text-align:center; margin-top:0;">My Questions</h2>
+            <div id="userQuestionsList"></div>
+        </div>
+    </div>
+
+    <div id="askSection" class="page hidden">
+        <div class="card">
+            <h3>Type your question</h3>
+            <textarea id="qInput" rows="6" class="urdu-content" placeholder="Yahan apna sawal likhen..."></textarea>
+            <button class="main-btn" onclick="handleAskPost()">Post Question</button>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="nav-item active" onclick="showPage('home')"><i data-lucide="home"></i><span>Home</span></div>
+    <div class="nav-item" onclick="showPage('ask')"><i data-lucide="plus-square"></i><span>Ask</span></div>
+    <div class="nav-item" onclick="showPage('profile')"><i data-lucide="user"></i><span>Profile</span></div>
+</footer>
+
+<script type="module">
+    // Firebase Setup (Same as your config)
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut, createUserWithEmailAndPassword, signInWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyD57kA0XKRvlsM6W4LMZThiKm0N2WV6FTw",
+        authDomain: "deen-seekho-eabb8.firebaseapp.com",
+        projectId: "deen-seekho-eabb8",
+        storageBucket: "deen-seekho-eabb8.firebasestorage.app",
+        messagingSenderId: "887722708251",
+        appId: "1:887722708251:web:a9ad22b8d151162e19d7be"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    let currentUser = null;
+    let isMufti = false;
+    let userRole = 'user';
+    let isSignup = false;
+
+    lucide.createIcons();
+
+    // Navigation logic (Fixes the overlay issue)
+    window.showPage = (id) => {
+        document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+        let targetId = id;
+        if(id === 'profile') {
+            if(!currentUser) targetId = 'authSection';
+            else targetId = isMufti ? 'muftiDashboard' : 'userDashboard';
+        } else if (id === 'home') {
+            targetId = 'homeSection';
+        } else if (id === 'ask') {
+            targetId = 'askSection';
+        }
+
+        const el = document.getElementById(targetId);
+        if(el) el.classList.remove('hidden');
+        
+        // Footer active state logic
+        const navs = document.querySelectorAll('.nav-item');
+        if(id === 'home') navs[0].classList.add('active');
+        if(id === 'ask') navs[1].classList.add('active');
+        if(id === 'profile') navs[2].classList.add('active');
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        const authSec = document.getElementById('authSection');
+        if (user) {
+            currentUser = user;
+            authSec.classList.add('hidden'); // Fix: Hide login form immediately
+            document.getElementById('logoutBtn').classList.remove('hidden');
+            document.getElementById('userMail').innerText = user.email.split('@')[0];
+
+            const uDoc = await getDoc(doc(db, "users", user.uid));
+            if(uDoc.exists()) {
+                const data = uDoc.data();
+                isMufti = data.role === 'mufti';
+                document.getElementById('editName').value = data.name || "";
+                document.getElementById('editEdu').value = data.edu || "";
+            }
+            showPage('home');
+            loadGallery();
+            if(isMufti) loadMuftiStats();
+        } else {
+            currentUser = null;
+            authSec.classList.remove('hidden');
+            document.getElementById('logoutBtn').classList.add('hidden');
+            document.getElementById('muftiDashboard').classList.add('hidden');
+            document.getElementById('userDashboard').classList.add('hidden');
+        }
+    });
+
+    window.saveProfile = async () => {
+        if(!currentUser) return;
+        const name = document.getElementById('editName').value;
+        const edu = document.getElementById('editEdu').value;
+        await updateDoc(doc(db, "users", currentUser.uid), { name, edu });
+        alert("Profile Updated!");
+    };
+
+    // Firebase stats and gallery functions go here...
+    // (Aapke purane loadGallery aur post functions yahan add honge)
+
+</script>
+</body>
+</html>
